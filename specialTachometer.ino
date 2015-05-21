@@ -1,8 +1,9 @@
 /*******************************************************************************
 Precision tachometer
 by Anna Jõgi a.k.a Libahunt
-Public domain
 *******************************************************************************/
+#include <LiquidCrystal.h>
+
 /* SETTINGS */
 const int roundsToCount = 30;/* 30 rounds is roughly 1.5 seconds around 1100rpm */
 const unsigned long debounceTime = 1000;/* needs experimentation, probably upper limit is 5000*/
@@ -15,12 +16,17 @@ unsigned long fallingTimes[roundsToCount];
 unsigned long intervals[roundsToCount-1];
 
 
-
+/* initialize library objects */
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
   
   DDRD = DDRD & ~0x10;//pin mode D4 is input
   Serial.begin(9600);
+  Serial.println("#Carburettor adjustment tachometer#");
+  lcd.begin(16, 2);
+  lcd.setCursor(0,0);
+  lcd.write("#Carburettor adjustment tachometer#");
   
 }
 
@@ -75,6 +81,12 @@ void loop() {
   Serial.print(" rpm ¬");
   Serial.print(offPercentage);
   Serial.println("%");
+  
+  /*output RPM to lcd */
+  lcd.setCursor(1,0);
+  lcd.write("rpm");
+  
+  delay(30);
   
 }
     
