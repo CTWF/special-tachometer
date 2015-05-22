@@ -6,7 +6,7 @@ by Anna Jõgi a.k.a Libahunt
 
 /* SETTINGS */
 const int roundsToCount = 30;/* 30 rounds is roughly 1.5 seconds around 1100rpm */
-const unsigned long debounceTime = 1000;/* needs experimentation, probably upper limit is 5000*/
+const unsigned long debounceTime = 5000;/* needs experimentation, probably upper limit is 5000*/
 
 /* variables */
 boolean falling = false;
@@ -21,12 +21,12 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
   
-  DDRD = DDRD & ~0x10;//pin mode D4 is input
+  DDRB = DDRB & ~0x01;//pin mode D8 is input
   Serial.begin(9600);
   Serial.println("#Carburettor adjustment tachometer#");
   lcd.begin(16, 2);
   lcd.setCursor(0,0);
-  lcd.write("#Carburettor adjustment tachometer#");
+  lcd.write("#Carb adj tach#");
   
 }
 
@@ -36,8 +36,8 @@ void loop() {
   fill fallingTimes array with microsecond timestamps*/
   rounds=0;
   while (rounds < roundsToCount) {
-    currState = PIND & 0x10;//digitalRead pin 4;
-    if (currState == 0 && prevState == 0x10) {
+    currState = PINB & 0x01;//digitalRead pin 8;
+    if (currState == 0 && prevState == 0x01) {
       falling = true;
       debounceStart = micros();
     }
@@ -83,8 +83,8 @@ void loop() {
   Serial.println("%");
   
   /*output RPM to lcd */
-  lcd.setCursor(1,0);
-  lcd.write("rpm");
+  lcd.setCursor(0,1);
+  lcd.print(rpm, DEC);
   
   delay(30);
   
