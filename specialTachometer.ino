@@ -2,13 +2,22 @@
 Precision tachometer
 by Anna Jõgi a.k.a Libahunt
 *******************************************************************************/
+
+/*
+TODO:
+- add timeout (zero out)
+- add some way to check for missed beats
+*/
+
+
 #include <LiquidCrystal.h>
 
 /* SETTINGS */
-const int roundsToCount = 30;/* 30 rounds is roughly 1.5 seconds around 1100rpm */
-const unsigned long debounceTime = 5000;/* needs experimentation, probably upper limit is 5000*/
+const int roundsToCount = 60;/* 60 rounds is roughly 3 seconds around 1100rpm */
 
 /* variables */
+unsigned long debounceTime; /*gets set with pontentiometer*/
+
 boolean falling = false;
 int i, rpm, rounds, offPercentage, currState, prevState;
 unsigned long debounceStart, intervalsSum, averageInterval, diff, maxDiff;
@@ -32,6 +41,9 @@ void setup() {
 
 void loop() {
 
+  debounceTime = analogRead(A0)*488; /*488=500000/1023*/
+  
+  
   /*listen for falling edges for number of time specified in roundsToCount,
   fill fallingTimes array with microsecond timestamps*/
   rounds=0;
@@ -72,19 +84,24 @@ void loop() {
     }
     offPercentage = (int) diff*100/averageInterval;
     
-    rpm = (int) (60000000/averageInterval);
+    rpm = (int) (60000000/(averageInterval*2));/*divided by 2 because of waisted spark system*/
     
   }
   
   /*output the numbers to Serial port*/
   Serial.print(rpm);
-  Serial.print(" rpm ¬");
+  Serial.print(" rpm ");
   Serial.print(offPercentage);
-  Serial.println("%");
+  Serial.print("%   debounce: ");
+  Serial.print(debounceTime/1000, DEC);
+  Serial.println("ms");
   
   /*output RPM to lcd */
   lcd.setCursor(0,1);
   lcd.print(rpm, DEC);
+  
+  lcd.setCursor(10,1);
+  lcd.print(debounceTime/1000, DEC);
   
   delay(30);
   
