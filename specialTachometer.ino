@@ -31,17 +31,22 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 void setup() {
   
   DDRB = DDRB & ~0x01;//pin mode D8 is input
+  pinMode(A1, INPUT);
   Serial.begin(9600);
   Serial.println("#Carburettor adjustment tachometer#");
   lcd.begin(16, 2);
   lcd.setCursor(0,0);
   lcd.write("#Carb adj tach#");
   
+  debounceTime = analogRead(A1); /*488=500000/1023*/
+  debounceTime = debounceTime*488;
+  lcd.setCursor(10,1);
+  lcd.print(debounceTime/1000, DEC);
 }
 
 void loop() {
 
-  debounceTime = analogRead(A0)*488; /*488=500000/1023*/
+  debounceTime = analogRead(A1)*488; /*488=500000/1023*/
   
   
   /*listen for falling edges for number of time specified in roundsToCount,
